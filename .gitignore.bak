@@ -130,9 +130,3 @@ dmypy.json
 
 # .idea
 .idea
-
-# .jpg
-.jpg
-
-.vscode/
-*.code-workspace

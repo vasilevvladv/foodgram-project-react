@@ -1,0 +1,129 @@
+
+POST http://127.0.0.1:8000/api/users/
+content-type: application/json
+
+{
+"email": "vpupkin@yandex.ru",
+"username": "vasya.pupkin",
+"first_name": "Вася",
+"last_name": "Пупкин",
+"password": "Qwerty123"
+}
+
+###
+POST http://127.0.0.1:90/api/users/
+content-type: application/json
+
+{
+"email": "user2@yandex.ru",
+"username": "user2",
+"first_name": "Валя",
+"last_name": "Шлюпкина",
+"password": "Qwerty123"
+}
+
+###
+POST http://127.0.0.1:8000/api/auth/token/login/
+content-type: application/json
+
+{
+"password": "Qwerty123",
+"email": "vpupkin@yandex.ru"
+}
+
+
+
+########
+
+
+ "auth_token": "c6cd3ca29d51a7f511f44e1c745bc7a32c16d0f3"
+
+
+c50cfcc62aff29e5fd2d3aca4900ba4eee9ad117
+
+
+#########
+
+
+
+
+GET http://127.0.0.1:8000/api/users
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+
+
+###
+GET http://127.0.0.1:8000/api/users/2
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+######
+
+POST http: //127.0.0.1:90/api/auth/token/login/
+content-type: application/json
+Authorization: token 5aedb1d6177e173f2e7ae9e2abb6ce61c48fb797
+
+
+####
+
+POST  http://127.0.0.1:8000/api/recipes/
+content-type: application/json
+Authorization: token c6cd3ca29d51a7f511f44e1c745bc7a32c16d0f3
+  "ingredients": [
+    {
+      "id": 278,
+      "amount": 10
+    }
+  ],
+  "tags": [
+    1
+  ],
+  "image": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABAgMAAABieywaAAAACVBMVEUAAAD///9fX1/S0ecCAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAACklEQVQImWNoAAAAggCByxOyYQAAAABJRU5ErkJggg==",
+  "name": "Щи",
+  "text": "Щи вкусные",
+  "cooking_time": 50
+}
+####
+GET http://127.0.0.1:8000/api/users/subscriptions/
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+####
+
+POST  http://127.0.0.1:8000/api/users/2/subscribe/
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+#######
+
+GET http://127.0.0.1:8000/api/users/subscriptions/
+content-type: application/json
+Authorization: token c50cfcc62aff29e5fd2d3aca4900ba4eee9ad117
+
+
+
+############
+
+GET  http://127.0.0.1:8000/api/recipes/
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+
+#########
+GET  http://127.0.0.1:8000/api/recipes/?page=2 
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+###########
+
+GET  http://127.0.0.1:8000/api/recipes/?page=1&limit=1&is_in_shopping_cart=1
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+
+
+##############
+
+GET  http://127.0.0.1:8000/api/recipes/?page=1&limit=6&is_in_shopping_cart=1
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
