@@ -3,11 +3,7 @@ from users.models import USER_ROLE_ADMIN
 
 
 class IsAdminOrReadOnly(BasePermission):
-    """
-    Permission for admin, superuser.
-    Admin and superuser has permissions for reading/writing.
-    Users have permissions for reading.
-    """
+
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS or (
             request.user.is_authenticated
@@ -17,10 +13,7 @@ class IsAdminOrReadOnly(BasePermission):
 
 
 class IsOwnerAdminOrReadOnly(BasePermission):
-    """
-    Permission for admin, superuser, owner.
-    Admin and superuser have permissions for writing.
-    """
+
     def has_permission(self, request, view):
         return (
             request.method in SAFE_METHODS

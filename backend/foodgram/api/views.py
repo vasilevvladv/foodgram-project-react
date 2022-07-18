@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-from urllib.parse import unquote
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import PermissionDenied
@@ -69,7 +66,6 @@ class CustomUserViewSet(UserViewSet):
             api/users/set_password/
     """
 
-    #queryset = CustomUser.objects.all()
     pagination_class = CustomPageNumberPagination
 
     def get_serializer_class(self):

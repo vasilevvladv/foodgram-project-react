@@ -1,6 +1,5 @@
 from django_filters import FilterSet
 from django_filters.filters import (CharFilter, ChoiceFilter,
-                                    ModelChoiceFilter,
                                     ModelMultipleChoiceFilter, NumberFilter)
 from recipes.models import Ingredient, Recipe, Tag
 
@@ -33,9 +32,8 @@ class RecipeFilter(FilterSet):
         choices=RECIPE_CHOICES,
         method='get_is_in'
     )
-    
+
     def get_is_in(self, queryset, name, value):
-        
         user = self.request.user
         if user.is_anonymous:
             return queryset
@@ -45,8 +43,7 @@ class RecipeFilter(FilterSet):
             if name == 'is_in_shopping_cart':
                 queryset = queryset.filter(shopping_cart__user=user)
         return queryset
-    
+
     class Meta:
         model = Recipe
         fields = ('tags', 'author', 'is_favorited', 'is_in_shopping_cart')
-                    

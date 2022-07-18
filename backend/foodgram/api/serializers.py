@@ -3,9 +3,43 @@ from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from recipes.models import Ingredient, Recipe, RecipeIngredientAmount, Tag
-from rest_framework import serializers, status
-from rest_framework.response import Response
+from rest_framework import serializers
 from users.models import CustomUser
+
+
+class IsSubscribedMixin:
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        if user.is_authenticated:
+            if isinstance(obj, CustomUser):
+                return user.sub_user.filter(author=obj).exists()
+            return True
+        return False
+
+    def get_recipes_template(self, recipes):
+        request = self.context.get('request')
+        limit = request.query_params.get('recipes_limit')
+        if limit:
+            recipes = recipes[:int(limit)]
+        serializer = ShortRecipeSerializer(
+            recipes, many=True, context={'request': request}
+        )
+        return serializer.data
+
+
+class RecipeWriteMixin:
+
+    def create_recipe_ingridient(self, ingredients, instance):
+        listobj = []
+        for ingredient in ingredients:
+            ingredient_id, amount = ingredient['id'], ingredient['amount']
+            listobj.append(RecipeIngredientAmount(
+                recipe=instance,
+                ingredient_id=ingredient_id,
+                amount=amount
+            ))
+        RecipeIngredientAmount.objects.bulk_create(listobj)
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -21,18 +55,8 @@ class IngredientSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class IsSubscribedMethod:
-    def get_is_subscribed(self, obj):
-        user = self.context.get('request').user
-        if user.is_authenticated:
-            if isinstance(obj, CustomUser):
-                return user.sub_user.filter(author=obj).exists()
-            return True
-        return False
-
-
 class CustomUserReadSerializer(serializers.ModelSerializer,
-                               IsSubscribedMethod):
+                               IsSubscribedMixin):
     is_subscribed = serializers.SerializerMethodField(
         read_only=True
     )
@@ -79,7 +103,7 @@ class CustomUserSetPasswordSerializer(serializers.Serializer):
 
 
 class SubscriptionSerializer(serializers.ModelSerializer,
-                             IsSubscribedMethod):
+                             IsSubscribedMixin):
     id = serializers.IntegerField(source='author.id')
     email = serializers.EmailField(source='author.email')
     username = serializers.CharField(source='author.username')
@@ -98,23 +122,18 @@ class SubscriptionSerializer(serializers.ModelSerializer,
             'is_subscribed', 'recipes', 'recipes_count')
 
     def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.query_params.get('recipes_limit')
-        recipes = obj.author.recipes.only('id', 'name',
-                                          'image', 'cooking_time')
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = ShortRecipeSerializer(
-            recipes, many=True, context={'request': request}
+        return self.get_recipes_template(
+            obj.author.recipes.only(
+                'id', 'name', 'image', 'cooking_time'
+            )
         )
-        return serializer.data
 
     def get_recipes_count(self, obj):
         return obj.author.recipes.count()
 
 
 class SubscribeSerializer(serializers.ModelSerializer,
-                          IsSubscribedMethod):
+                          IsSubscribedMixin):
 
     is_subscribed = serializers.SerializerMethodField(
         read_only=True
@@ -127,31 +146,23 @@ class SubscribeSerializer(serializers.ModelSerializer,
         fields = (
             'email', 'id', 'username', 'first_name', 'last_name',
             'is_subscribed', 'recipes', 'recipes_count')
-        
+
+    def get_recipes(self, obj):
+        return self.get_recipes_template(obj.recipes.all())
+
     def validate(self, value):
         user = self.context['request'].user
         author = value['author']
         subscription = user.sub_user.filter(author=author)
         if subscription.exists():
             raise serializers.ValidationError(
-                'Нельзя дважды подписаться на одного автора.'                
+                'Нельзя дважды подписаться на одного автора.'
             )
         if user == author:
             raise serializers.ValidationError(
                 'Подписаться на себя не получится.'
             )
         return value
-
-    def get_recipes(self, obj):
-        request = self.context.get('request')
-        limit = request.query_params.get('recipes_limit')
-        recipes = obj.recipes.all()
-        if limit:
-            recipes = recipes[:int(limit)]
-        serializer = ShortRecipeSerializer(
-            recipes, many=True, context={'request': request}
-        )
-        return serializer.data
 
     def get_recipes_count(self, obj):
         results = Recipe.objects.filter(author=obj).aggregate(
@@ -187,7 +198,7 @@ class IngredientAmountSerializer(serializers.ModelSerializer):
     def validate_amount(self, value):
         if value <= 0:
             return serializers.ValidationError(
-                'Добавьте ингридиенты'
+                'Добавьте ингредиенты'
             )
         return value
 
@@ -225,7 +236,8 @@ class RecipeReadSerializer(serializers.ModelSerializer):
         return False
 
 
-class RecipeWriteSerializer(serializers.ModelSerializer):
+class RecipeWriteSerializer(serializers.ModelSerializer,
+                            RecipeWriteMixin):
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all()
@@ -259,7 +271,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             )
             if ingredient_obj in list_of_ingredients:
                 raise serializers.ValidationError(
-                    'Добавьте ингридиенты',
+                    'Рецепт не может включать двух одиноковых ингредиентов.',
                 )
             list_of_ingredients.append(ingredient_obj)
 
@@ -285,14 +297,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
-
-        for ingredient in ingredients:
-            ingredient_id, amount = ingredient['id'], ingredient['amount']
-            RecipeIngredientAmount.objects.create(
-                recipe=recipe,
-                ingredient_id=ingredient_id,
-                amount=amount
-            )
+        self.create_recipe_ingridient(ingredients=ingredients,
+                                      instance=recipe)
         recipe.tags.set(tags)
         return recipe
 
@@ -300,13 +306,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
         if 'ingredients' in validated_data:
             ingredients = validated_data.pop('ingredients')
             instance.ingredients.clear()
-            for ingredient in ingredients:
-                ingredient_id, amount = ingredient['id'], ingredient['amount']
-                RecipeIngredientAmount.objects.create(
-                    recipe=instance,
-                    ingredient_id=ingredient_id,
-                    amount=amount
-                )
+            self.create_recipe_ingridient(ingredients=ingredients,
+                                          instance=instance)
         if 'tags' in validated_data:
             tags = validated_data.pop('tags')
             instance.tags.clear()
