@@ -1,9 +1,12 @@
+from dataclasses import dataclass
 from urllib.parse import unquote
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
+from django.core.exceptions import PermissionDenied
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 from recipes.models import (Favorite, Ingredient, Recipe, ShoppingCart,
                             Subscription, Tag)
@@ -13,6 +16,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from users.models import CustomUser
 
+from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPageNumberPagination
 from .permissions import IsAdminOrReadOnly, IsOwnerAdminOrReadOnly
 from .serializers import (CustomUserReadSerializer,
@@ -45,23 +49,8 @@ class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = (IsAdminOrReadOnly,)
     serializer_class = IngredientSerializer
     pagination_class = None
-
-    def get_queryset(self):
-        name = self.request.query_params.get('name')
-        queryset = self.queryset
-        if name:
-            if name[0] == '%':
-                name = unquote(name)
-            else:
-                name = name.translate(KEYBOARD_LAYOUT)
-            name = name.lower()
-            startswith_queryset = list(queryset.filter(name__startswith=name))
-            contain_queryset = queryset.filter(name__contains=name)
-            startswith_queryset.extend(
-                [i for i in contain_queryset if i not in startswith_queryset]
-            )
-            queryset = startswith_queryset
-        return queryset
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = IngredientFilter
 
 
 class CustomUserViewSet(UserViewSet):
@@ -80,7 +69,7 @@ class CustomUserViewSet(UserViewSet):
             api/users/set_password/
     """
 
-    queryset = CustomUser.objects.all()
+    #queryset = CustomUser.objects.all()
     pagination_class = CustomPageNumberPagination
 
     def get_serializer_class(self):
@@ -92,6 +81,9 @@ class CustomUserViewSet(UserViewSet):
         if 'password' in self.request.data:
             password = make_password(self.request.data['password'])
             serializer.save(password=password)
+
+    def get_queryset(self):
+        return CustomUser.objects.all()
 
     @action(
         detail=False,
@@ -108,13 +100,12 @@ class CustomUserViewSet(UserViewSet):
             data=request.data,
             context={'request': request}
         )
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(
-                {'message': 'Пароль успешно изменен'},
-                status=status.HTTP_201_CREATED
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(
+            {'message': 'Пароль успешно изменен'},
+            status=status.HTTP_201_CREATED
+        )
 
     @action(
         detail=False,
@@ -149,19 +140,10 @@ class CustomUserViewSet(UserViewSet):
         author = get_object_or_404(CustomUser, pk=id)
         subscription = user.sub_user.filter(author=author)
         if request.method == 'POST':
-            if subscription.exists():
-                return Response(
-                    {'message': 'Нельзя дважды подписаться на одного автора.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            if user == author:
-                return Response(
-                    {'message': 'Подписаться на себя не получится.'},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
             serializer = SubscribeSerializer(
                 author, context={'request': request}
             )
+            serializer.validate({'author': author})
             Subscription.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -181,9 +163,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     GET, POST: /api/recipes/
     GEt, PATCH, DELETE: /api/recipes/{id}/
     """
-
+    queryset = Recipe.objects.all()
     permission_classes = (IsOwnerAdminOrReadOnly,)
     pagination_class = CustomPageNumberPagination
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = RecipeFilter
 
     def get_serializer_class(self):
         if self.request.method == 'GET':
@@ -194,27 +178,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=self.request.user)
 
     def perform_update(self, serializer):
-        serializer.save(author=self.request.user)
-
-    def get_queryset(self):
-        queryset = Recipe.objects.all()
-        tags = self.request.query_params.getlist('tags')
-        if tags:
-            queryset = queryset.filter(
-                tags__slug__in=tags).distinct()
-        user = self.request.user
-        if user.is_anonymous:
-            return queryset
-        author = self.request.query_params.get('author')
-        if author:
-            queryset = queryset.filter(author=author)
-        is_in_shopping = self.request.query_params.get('is_in_shopping_cart')
-        if is_in_shopping in ('1', 'true',):
-            queryset = queryset.filter(shopping_cart__user=user)
-        is_favorited = self.request.query_params.get('is_favorited')
-        if is_favorited in ('1', 'true',):
-            queryset = queryset.filter(favorite_recipe__user=user)
-        return queryset
+        if serializer.instance.author != self.request.user:
+            raise PermissionDenied('Изменение чужого контента запрещено!')
+        super().perform_update(serializer)
 
     def control_existence_recipe(self, model, pk, request):
         recipe = get_object_or_404(Recipe, pk=pk)

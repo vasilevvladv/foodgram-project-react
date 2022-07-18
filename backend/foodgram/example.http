@@ -40,7 +40,7 @@ content-type: application/json
 
 
 c50cfcc62aff29e5fd2d3aca4900ba4eee9ad117
-
+af79062ff855b89f5e9f0fa692a573d7ee8c621c
 
 #########
 
@@ -90,7 +90,7 @@ content-type: application/json
 Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
 ####
 
-POST  http://127.0.0.1:8000/api/users/2/subscribe/
+POST  http://127.0.0.1:8000/api/users/4/subscribe/
 content-type: application/json
 Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
 
@@ -98,7 +98,7 @@ Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
 
 GET http://127.0.0.1:8000/api/users/subscriptions/
 content-type: application/json
-Authorization: token c50cfcc62aff29e5fd2d3aca4900ba4eee9ad117
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
 
 
 
@@ -127,3 +127,49 @@ Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
 GET  http://127.0.0.1:8000/api/recipes/?page=1&limit=6&is_in_shopping_cart=1
 content-type: application/json
 Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+
+#########
+
+GET  http://127.0.0.1:8000/api/recipes/?page=1&limit=6&is_favorited=1
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+
+
+
+
+#####################
+
+GET  http://127.0.0.1/api/ingredients/1/
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+
+
+
+/api/recipes/?page=1&limit=6&is_favorited=1
+
+
+
+http://127.0.0.1/favorites
+#######
+
+GET  http://127.0.0.1:8000/api/users/subscriptions
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+  
+
+#####################
+
+GET  http://127.0.0.1:8000/api/users/subscriptions/?page=1&limit=6&recipes_limit=1
+content-type: application/json
+Authorization: token af79062ff855b89f5e9f0fa692a573d7ee8c621c
+#
+
+
+
+
+
+
+
+   http://127.0.0.1:8000/api/users/subscriptions/?page=1&limit=6&recipes_limit=3

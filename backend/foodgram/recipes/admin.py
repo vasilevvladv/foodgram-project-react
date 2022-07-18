@@ -61,7 +61,7 @@ class ShoppingCartAdmin(admin.ModelAdmin):
 
 @admin.register(Subscription)
 class SubscriptionAdmin(admin.ModelAdmin):
-    List_display = ('id', 'user', 'author',
+    list_display = ('id', 'user', 'author',
                     'subscribe_date')
     search_fields = ('user__username', 'author__username')
     empty_value_display = EMPTY_VALUE
@@ -90,16 +90,12 @@ class RecipeAdmin(admin.ModelAdmin):
 
     @admin.display(description='Игредиенты')
     def get_ingredients(self, obj):
-        ingredients = [
-            ingredient.name for ingredient in obj.ingredients.all()
-        ]
+        ingredients = obj.ingredients.all().values_list('name', flat=True)
         return ', '.join(ingredients)
 
     @admin.display(description='Тэги')
     def get_tags(self, obj):
-        tags = [
-            tag.name for tag in obj.tags.all()
-        ]
+        tags =  obj.tags.all().values_list('name', flat=True)
         return ', '.join(tags)
 
     @admin.display(description='В избранном')
