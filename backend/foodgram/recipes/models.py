@@ -1,8 +1,9 @@
-from colorfield.fields import ColorField
 from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 from django.db.models import CASCADE, CheckConstraint, F, Q, UniqueConstraint
+
+from colorfield.fields import ColorField
 
 CustomUser = get_user_model()
 
@@ -127,7 +128,7 @@ class Favorite(models.Model):
         constraints = (
             UniqueConstraint(
                 fields=('user', 'recipe'), name='unique_favorite'),
-            )
+        )
 
     def __str__(self):
         return f'{self.user} добавил(-а) в избранное {self.recipe}'
