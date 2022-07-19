@@ -143,7 +143,6 @@ class CustomUserViewSet(UserViewSet):
             serializer.validate({'author': author})
             Subscription.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         if request.method == 'DELETE':
             if not subscription:
                 return Response(
@@ -195,7 +194,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             )
             model.objects.create(user=user, recipe=recipe)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-
         if request.method == 'DELETE':
             if not queryset:
                 return Response(
