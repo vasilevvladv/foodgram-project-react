@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -7,23 +8,27 @@ load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
+ENV_PATH = str(Path('./.env').resolve())
+
+load_dotenv(ENV_PATH)
+
 SECRET_KEY = os.getenv(
     'SECRET_KEY',
     default='django-insecure-#f&t1n2td1=g=eba(hbz-7z20f301%b1#n7id5l@5mu3-cux-6'
 )
 
-DEBUG = True
+DEBUG = os.getenv('DEBUG', default=False)
 
 MAX_LEN_REPR = 30
 
 ALLOWED_HOSTS = [
-    '*',
-    '127.0.0.1'
+    'web',
+    '127.0.0.1',
+    '62.84.121.99'
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -72,20 +77,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'foodgram.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/3.2/ref/settings/#databases
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': os.getenv('DB_ENGINE', default='django.db.backends.postgresql'),
+        'NAME': os.getenv('DB_NAME', default='foodgram'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='AzbukA777'),
+        'HOST': os.getenv('DB_HOST', default='db'),
+        'PORT': os.getenv('DB_PORT', default='5432')
     }
-}
-
-
-# Password validation
-# https://docs.djangoproject.com/en/3.2/ref/settings/#auth-password-validators
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -101,10 +102,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
-
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
 
 LANGUAGE_CODE = 'ru-RU'
 
@@ -149,4 +146,6 @@ DJOSER = {
 
 EMPTY_VALUE = '-empty-'
 
-CSRF_TRUSTED_ORIGINS = ['http://*.127.0.0.1']
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS', default='http://62.84.121.99'
+).split(',')
