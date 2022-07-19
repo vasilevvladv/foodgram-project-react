@@ -2,11 +2,13 @@ import io
 from pathlib import Path
 
 from django.db.models import Sum
-from recipes.models import RecipeIngredientAmount
+
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
+
+from recipes.models import RecipeIngredientAmount
 
 FONTS_DIR = Path('./fonts/TimesNewRoman.ttf').resolve()
 
@@ -39,7 +41,7 @@ def create_pdf_shopping_cart(user):
         buffer.seek(0)
         return buffer
     else:
-        pdf_page.drawCentredString(315, 425,  'Список покупок пуст')
+        pdf_page.drawCentredString(315, 425, 'Список покупок пуст')
         pdf_page.showPage()
         pdf_page.save()
         buffer.seek(0)

@@ -1,10 +1,7 @@
 from django_filters import FilterSet
-from django_filters.filters import (
-    CharFilter,
-    ChoiceFilter,
-    ModelMultipleChoiceFilter,
-    NumberFilter,
-)
+from django_filters.filters import (CharFilter, ChoiceFilter,
+                                    ModelMultipleChoiceFilter, NumberFilter)
+
 from recipes.models import Ingredient, Recipe, Tag
 
 RECIPE_CHOICES = (
