@@ -3,7 +3,7 @@ services:
 
   frontend:
     container_name: frontend_foodgram
-    image: simatheone/foodgram-frontend:latest
+    image: vasilevvladv22/foodgram-frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
 
@@ -16,7 +16,7 @@ services:
 
   backend:
     container_name: backend_foodgram
-    image: simatheone/foodgram-backend:latest
+    image: vasilevvladv22/foodgram-backend:latest
     restart: always
     volumes:
       - static_value:/foodgram_backend/static/
