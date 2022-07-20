@@ -1,5 +1,5 @@
 
-![Status workflow](https://github.com/vasilevva/foodgram-project-react/workflows/main.yml/badge.svg)
+![Status workflow](https://github.com/vasilevva/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 ### DEMO
 Демонстрационный проект развернут по адресу http://62.84.121.99
