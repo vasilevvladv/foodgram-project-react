@@ -1,19 +1,13 @@
 version: '3.3'
 services:
 
-  frontend:
-    container_name: frontend_foodgram
-    image: vasilevvladv22/foodgram-frontend:latest
-    volumes:
-      - ../frontend/:/app/result_build/
-
   db:
     image: postgres:13.0-alpine
     volumes:
       - postgres_data:/var/lib/postgres/data/
     env_file:
       - ./.env
-
+  
   backend:
     container_name: backend_foodgram
     image: vasilevvladv22/foodgram-backend:latest
@@ -25,7 +19,15 @@ services:
       - db
     env_file:
       - ./.env
- 
+
+  frontend:
+    container_name: frontend_foodgram
+    image: vasilevvladv22/foodgram-frontend:latest
+    volumes:
+      - ../frontend/:/app/result_build/
+    depends_on:
+      - backend
+
   nginx:
     container_name: nginx_foodgram
     image: nginx:1.21.3-alpine
