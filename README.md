@@ -51,4 +51,4 @@ sudo docker-compose up -d --build
 docker exec -it <CONTAINER ID> bash
 python manage.py createsuperuser
 ```
-6. зайдите в админку сайта и создайте теги рецептов .
+6. Зайдите в админку сайта и создайте теги рецептов .
