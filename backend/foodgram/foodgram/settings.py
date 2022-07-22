@@ -23,7 +23,7 @@ DEBUG = os.getenv('DEBUG', default=True)
 MAX_LEN_REPR = 30
 
 ALLOWED_HOSTS = [
-    'web',
+    '*',
     '127.0.0.1',
     '62.84.121.99'
 ]
