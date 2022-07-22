@@ -147,5 +147,5 @@ DJOSER = {
 EMPTY_VALUE = '-empty-'
 
 CSRF_TRUSTED_ORIGINS = os.getenv(
-    'CSRF_TRUSTED_ORIGINS', default='http://62.84.121.99'
+    'CSRF_TRUSTED_ORIGINS', default='http://127.0.0.1'
 ).split(',')
