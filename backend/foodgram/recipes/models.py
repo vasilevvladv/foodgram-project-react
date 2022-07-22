@@ -28,7 +28,7 @@ class Tag(models.Model):
 
 
 class Ingredient(models.Model):
-    """Ингридиенты для рецепта."""
+    """Ингредиенты для рецепта."""
     name = models.CharField(verbose_name='Ингридиент',
                             max_length=200)
     measurement_unit = models.CharField(verbose_name='Единица измерения',
@@ -50,7 +50,7 @@ class Ingredient(models.Model):
 
 
 class RecipeIngredientAmount(models.Model):
-    """Количество ингридиентов в блюде."""
+    """Количество ингредиентов в блюде."""
     recipe = models.ForeignKey('Recipe', verbose_name='В рецептах',
                                related_name='recipe',
                                on_delete=models.CASCADE)
@@ -70,7 +70,7 @@ class RecipeIngredientAmount(models.Model):
 
     class Meta:
         verbose_name = 'Ингредиент'
-        verbose_name_plural = 'Количество ингридиентов'
+        verbose_name_plural = 'Количество ингредиентов'
         constraints = [
             UniqueConstraint(
                 fields=('recipe', 'ingredient'),

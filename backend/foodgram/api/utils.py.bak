@@ -2,6 +2,7 @@ import io
 from pathlib import Path
 
 from django.db.models import Sum
+
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
