@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv(
     default='django-insecure-#f&t1n2td1=g=eba(hbz-7z20f301%b1#n7id5l@5mu3-cux-6'
 )
 
-DEBUG = os.getenv('DEBUG', default=False)
+DEBUG = os.getenv('DEBUG', default=True)
 
 MAX_LEN_REPR = 30
 
