@@ -3,8 +3,9 @@ from django.shortcuts import get_object_or_404
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 
-from recipes.models import Ingredient, Recipe, RecipeIngredientAmount, Tag
-from users.models import CustomUser, Subscription
+from recipes.models import (Ingredient, Recipe, RecipeIngredientAmount,
+                            Subscription, Tag)
+from users.models import CustomUser
 
 
 class IsSubscribedMixin:
