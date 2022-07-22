@@ -18,7 +18,7 @@ SECRET_KEY = os.getenv(
     default='django-insecure-#f&t1n2td1=g=eba(hbz-7z20f301%b1#n7id5l@5mu3-cux-6'
 )
 
-DEBUG = os.getenv('DEBUG', default=True)
+DEBUG = os.getenv('DEBUG', default=False)
 
 MAX_LEN_REPR = 30
 
@@ -146,11 +146,13 @@ DJOSER = {
 
 EMPTY_VALUE = '-empty-'
 
-CSRF_TRUSTED_ORIGINS = [
-    "http://*localhost",
-    "https://*localhost",
-    "http://*127.0.0.1",
-    "https://*127.0.0.1",
-    "http://*62.84.121.99",
-    "https://*62.84.121.99"
-]
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS', default=[
+        'http://*localhost',
+        'https://*localhost',
+        'http://*127.0.0.1',
+        'https://*127.0.0.1',
+        'http://*62.84.121.99',
+        'https://*62.84.121.99'
+    ]
+).split(',')
