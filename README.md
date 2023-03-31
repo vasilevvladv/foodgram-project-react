@@ -2,7 +2,7 @@
 ![Status workflow](https://github.com/vasilevva/foodgram-project-react/actions/workflows/main.yml/badge.svg)
 
 ### DEMO
-Демонстрационный проект развернут по адресу http://62.84.121.99
+Демонстрационный проект развернут по адресу http://158.160.19.209
 Учетные данные:
 vasilevva@yandex.ru
 789123
