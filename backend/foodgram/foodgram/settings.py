@@ -25,7 +25,7 @@ MAX_LEN_REPR = 30
 ALLOWED_HOSTS = [
     '*',
     '127.0.0.1',
-    '62.84.121.99'
+    '158.160.19.209'
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -152,7 +152,7 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
         'https://*localhost,'
         'http://*127.0.0.1,'
         'https://*127.0.0.1,'
-        'http://*62.84.121.99,'
-        'https://*62.84.121.99'
+        'http://*158.160.19.209,'
+        'https://*158.160.19.209'
     )
 ).split(',')
